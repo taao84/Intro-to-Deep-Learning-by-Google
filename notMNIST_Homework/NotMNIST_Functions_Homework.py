@@ -26,7 +26,7 @@ import random
 
 url = 'https://commondatastorage.googleapis.com/books1000/'
 last_percent_reported = None
-data_root = '.' # Change me to store data elsewhere
+data_root = os.path.join(".", "datasets") # Change me to store data elsewhere
 image_size = 28  # Pixel width and height.
 pixel_depth = 255.0  # Number of levels per pixel.
 
@@ -52,8 +52,10 @@ def download_progress_hook(count, blockSize, totalSize):
 """----------------------------------------------------------------------"""
 
 def maybe_download(filename, expected_bytes, force=False):
-  """Download a file if not present, and make sure it's the right size."""
   dest_filename = os.path.join(data_root, filename)
+  if not os.path.exists(dest_filename):
+    os.mkdir(dest_filename)
+  """Download a file if not present, and make sure it's the right size."""
   if force or not os.path.exists(dest_filename):
     print('Attempting to download:', filename) 
     filename, _ = urlretrieve(url + filename, dest_filename, reporthook=download_progress_hook)
@@ -72,7 +74,9 @@ num_classes = 10
 np.random.seed(133)
 
 def maybe_extract(filename, force=False):
+  print ("Extracting: ", filename)
   root = os.path.splitext(os.path.splitext(filename)[0])[0]  # remove .tar.gz
+  print("Extracting to:", root)
   if os.path.isdir(root) and not force:
     # You may override by setting force=True.
     print('%s already present - Skipping extraction of %s.' % (root, filename))
